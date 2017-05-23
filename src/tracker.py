@@ -1,22 +1,14 @@
-# *************************************************
-# ********** Multi Object Motion Tracker **********
-# ************ Merav Joseph 200652063 *************
-# ************* Shir Amir 209712801 ***************
-# *************************************************
-
 import numpy as np
 import numpy.random as rnd
 import cv2
 import obj 
 
 VIDEO = r'../videos/ana.mp4'
-RECT_WIDTH = 30
-RECT_HEIGHT = 20
 
 # Initialize parameters
 video = cv2.VideoCapture(VIDEO)
 fgbg = cv2.bgsegm.createBackgroundSubtractorMOG()
-dog = obj.Obj((0,0), 'bucky', 20000, 1000000)
+dog = obj.Obj((0,0), 'becky', 20000, 1000000)
 robot = obj.Obj((0,0), 'robot', 5000, 9000)
 x_dog, y_dog, w_dog, h_dog = (0,0,0,0)
 x_robot, y_robot, w_robot, h_robot= (0,0,0,0)
