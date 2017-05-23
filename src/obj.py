@@ -30,6 +30,12 @@ class Obj:
         # The object's path
         self.path = [start_point]
 
+        # The object's bounding box
+        self.x, self.y, self.w, self.h = (0, 0, 0, 0)
+
+        # The object's Centriod
+        self.cx, self.cy = (0, 0)
+
     def update_path(self, path_point):
         if len(self.path) == Obj.max_path_length:
             del self.path[0]
@@ -37,3 +43,11 @@ class Obj:
 
     def __str__(self):
         return str(self.id)
+
+    def box(self, frame):
+        cv2.rectangle(frame, (self.x, self.y), (self.x + self.w, self.y + self.h), self.color, 2)
+        cv2.putText(frame, self.__str__(), (self.x, self.y + self.h + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, self.color, 2)
+
+    def print_trail(self, frame):
+        for point in self.path:
+            cv2.circle(frame, point, 3, self.color, -1)
