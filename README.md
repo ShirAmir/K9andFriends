@@ -1,15 +1,12 @@
-# Bug Motion Tracker
-**Merav Joseph 200652063 & Shir Amir 209712801**
+# Canine - Robot Interaction 
 
-The program attemps to detect and follow moving bugs in an video.
+The program attempts to assist ACI researchers to investigate Canine-Robotic interaction. 
+This prototype currently tracks a canine and a robot, then calculates the distance between them at any given time.
 
-### Algorithm & Implementation Details
-
-### Results
+### Algorithm & Technique
 
 ### Building Instructions
 
 ### Using Instructions
 
-#### Directory Tree
 

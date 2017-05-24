@@ -38,19 +38,25 @@ def paint_frame(frame, dog, robot, show_trail, show_boxes, show_distance):
         dist_loc = (int(np.shape(frame)[1]/10),int(np.shape(frame)[0]/10))
         cv2.putText(frame, 'Distance:' + str(dist), dist_loc, cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
 
-def track(fn, dog_min, dog_max, robot_min, robot_max):
+def track(fn, output_dir, dog_min, dog_max, robot_min, robot_max):
 
     # Initialize parameters
     video = cv2.VideoCapture(fn)
-    # Find a file name that isn't taken
-    #i = 1
-    #while os.path.isfile('%s%s%d%s' % (output_dir, 'result', i, '.mp4')):
-    #    i = i + 1
-    #fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    #new_video = cv2.VideoWriter('%s%s%d%s' % (output_dir, 'result', i, '.mp4'), fourcc, 20.0, (640,480))
     fgbg = cv2.bgsegm.createBackgroundSubtractorMOG()
-    dog = obj.Obj((0, 0), 'becky', 20000, 1000000)
-    robot = obj.Obj((0, 0), 'robot', 5000, 9000)
+    dog = obj.Obj((0, 0), 'becky', dog_min, dog_max)
+    robot = obj.Obj((0, 0), 'robot', robot_min, robot_max)
+
+    # Capture frame-by-frame
+    ret, frame = video.read()
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    # Find a file name that isn't taken
+    i = 1
+    while os.path.isfile('%s%s%d%s' % (output_dir, '/result', i, '.mp4')):
+        i = i + 1
+    fourcc = cv2.VideoWriter_fourcc(*'DIVX')
+    frame_size = (np.shape(frame)[1], np.shape(frame)[0])
+    new_video = cv2.VideoWriter('%s%s%d%s' % (output_dir, '/result', i, '.mp4'), fourcc, 20.0, frame_size)
 
     # Initialize interrupting parameters
     show_trail = 0
@@ -58,10 +64,6 @@ def track(fn, dog_min, dog_max, robot_min, robot_max):
     show_distance = 0
 
     while(True):
-        # Capture frame-by-frame
-        ret, frame = video.read()
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
         # Apply Background Subtraction
         fgmask = fgbg.apply(frame)
         fgmask = cv2.GaussianBlur(fgmask, (35, 35), 0)
@@ -138,8 +140,17 @@ def track(fn, dog_min, dog_max, robot_min, robot_max):
             break
         key = '0'
 
+        # Save frame to video
+        paint_frame(disp_frame, dog, robot, 1, 1, 1)
+        new_video.write(cv2.cvtColor(disp_frame, cv2.COLOR_BGR2RGB))
+
+        # Capture frame-by-frame
+        ret, frame = video.read()
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
     # When everything is done, release the capture
     video.release()
+    new_video.release()
     cv2.destroyAllWindows()
     
 if __name__ == "__main__":
