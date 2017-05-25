@@ -39,7 +39,7 @@ def paint_frame(frame, dog, robot, show_trail, show_boxes, show_distance):
         cv2.putText(frame, 'Distance:' + str(dist), dist_loc, cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
 
 def track(fn, output_dir, dog_min, dog_max, robot_min, robot_max):
-
+    j=0
     # Initialize parameters
     video = cv2.VideoCapture(fn)
     fgbg = cv2.bgsegm.createBackgroundSubtractorMOG()
@@ -70,7 +70,7 @@ def track(fn, output_dir, dog_min, dog_max, robot_min, robot_max):
 
         # Find object contours
         _, contours, hierarchy = cv2.findContours(fgmask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        cv2.drawContours(frame, contours, -1, (0, 0, 255), 2)
+        #cv2.drawContours(frame, contours, -1, (0, 0, 255), 2)
 
         if len(contours) != 0:
             best_contour, min_dist = find_best_contour(dog, contours)
@@ -123,8 +123,8 @@ def track(fn, output_dir, dog_min, dog_max, robot_min, robot_max):
             show_distance = 1 - show_distance
         elif key == ord(' '):
             key = '0'
-            while key != ord(' ') and key != ord('q'):
-                if key == ord('q'):
+            while key != ord(' ') and key != 27:
+                if key == 27:
                     break
                 elif key == ord('t'):
                     show_trail = 1 - show_trail
