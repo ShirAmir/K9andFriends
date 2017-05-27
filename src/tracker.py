@@ -4,6 +4,7 @@ import cv2
 import obj 
 import os
 import math
+import pandas as pd
 
 def find_best_contour(tracked_obj, contours):
 
@@ -35,16 +36,17 @@ def paint_frame(frame, dog, robot, show_trail, show_boxes, show_distance):
     if show_distance == 1:
         cv2.line(frame, (dog.cx, dog.cy), (robot.cx, robot.cy), (255, 0, 0), 2)
         dist = int(np.sqrt((dog.cx - robot.cx)**2 + (dog.cy - robot.cy)**2))
-        dist_loc = (int(np.shape(frame)[1]/10),int(np.shape(frame)[0]/10))
+        dist_loc = (int(np.shape(frame)[1]/10), int(np.shape(frame)[0]/10))
         cv2.putText(frame, 'Distance:' + str(dist), dist_loc, cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
 
 def track(fn, output_dir, dog_min, dog_max, robot_min, robot_max):
-    j=0
+
     # Initialize parameters
     video = cv2.VideoCapture(fn)
     fgbg = cv2.bgsegm.createBackgroundSubtractorMOG()
     dog = obj.Obj((0, 0), 'becky', dog_min, dog_max)
     robot = obj.Obj((0, 0), 'robot', robot_min, robot_max)
+    dist_list = []
 
     # Capture frame-by-frame
     ret, frame = video.read()
@@ -63,7 +65,7 @@ def track(fn, output_dir, dog_min, dog_max, robot_min, robot_max):
     show_boxes = 0
     show_distance = 0
 
-    while(True):
+    while(video.isOpened()):
         # Apply Background Subtraction
         fgmask = fgbg.apply(frame)
         fgmask = cv2.GaussianBlur(fgmask, (35, 35), 0)
@@ -140,18 +142,22 @@ def track(fn, output_dir, dog_min, dog_max, robot_min, robot_max):
             break
         key = '0'
 
-        # Save frame to video
+        # Save frame to video and distance to dist_list
         paint_frame(disp_frame, dog, robot, 1, 1, 1)
         new_video.write(cv2.cvtColor(disp_frame, cv2.COLOR_BGR2RGB))
+        dist = int(np.sqrt((dog.cx - robot.cx)**2 + (dog.cy - robot.cy)**2))
+        dist_list.append(dist)
 
         # Capture frame-by-frame
         ret, frame = video.read()
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-    # When everything is done, release the capture
+    # Finish up
+    df = pd.DataFrame(dist_list, columns=["distance"])
+    df.to_csv('../results/data%d.csv' % i, index=False)
     video.release()
     new_video.release()
     cv2.destroyAllWindows()
-    
+
 if __name__ == "__main__":
     track('../videos/ana.mp4', 20000, 1000000, 5000, 9000)
